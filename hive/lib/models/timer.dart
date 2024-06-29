@@ -49,50 +49,49 @@ class BuildTimer extends ChangeNotifier {
   }
 
   //把時間變2位數，顯示數字
-  Widget padLeftTime() {
+  String padLeftTime() {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
     String minutes = twoDigits(duration.inMinutes.remainder(60)); //取除以60的餘數
     String seconds = twoDigits(duration.inSeconds.remainder(60));
 
-    return timerUI(minutes, seconds);
+    return minutes + ':' + seconds;
   }
 
   // 切換開始、停止、取消鈕
   Widget buildButton() {
     return isRunning // 若正在計時，顯示停止鈕
-        ? ElevatedButton(
-            onPressed: stopTimer,
-            child: Text('STOP'),
-          )
-        : ElevatedButton(
-            // 若未計時，顯示開始鈕
-            onPressed: startCount,
-            child: Text('START'),
-          );
+      ? ElevatedButton(
+          onPressed: stopTimer,
+          child: Text('STOP'),
+        )
+      : ElevatedButton(
+          // 若未計時，顯示開始鈕
+          onPressed: startCount,
+          child: Text('START'),
+        );
   }
 
   // timerUI
-  Widget timerUI(minutes, seconds) => Container(
-        color: Colors.amber[100],
-        child: SizedBox(
-          height: 200,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+  Widget timerUI(String time) => Container(
+    color: Color.fromARGB(255, 245, 239, 223),
+    child: SizedBox(
+      height: 150,
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          // 顯示時間
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    minutes,
-                    style: TextStyle(fontSize: 48),
-                  ),
-                  Text(' : ', style: TextStyle(fontSize: 48)),
-                  Text(seconds, style: TextStyle(fontSize: 48))
-                ],
+              Text(
+                time,
+                style: TextStyle(fontSize: 48),
               ),
-              buildButton()
             ],
           ),
-        ),
-      );
+          buildButton() // 開始、停止、取消鈕
+        ],
+      ),
+    ),
+  );
 }

@@ -15,7 +15,10 @@ void main() async {
     ),
     ChangeNotifierProvider(
       create: (context) => BuildTimer(context),
-    )
+    ),
+    ChangeNotifierProvider(
+      create: (context) => NotesPage(context),
+    ),
   ], child: const MainApp()));
 }
 
@@ -24,7 +27,7 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-        debugShowCheckedModeBanner: false, home: NotesPage());
+    return MaterialApp(
+        debugShowCheckedModeBanner: false, home: NotesPage(context).build());
   }
 }
