@@ -60,38 +60,38 @@ class BuildTimer extends ChangeNotifier {
   // 切換開始、停止、取消鈕
   Widget buildButton() {
     return isRunning // 若正在計時，顯示停止鈕
-      ? ElevatedButton(
-          onPressed: stopTimer,
-          child: Text('STOP'),
-        )
-      : ElevatedButton(
-          // 若未計時，顯示開始鈕
-          onPressed: startCount,
-          child: Text('START'),
-        );
+        ? ElevatedButton(
+            onPressed: stopTimer,
+            child: Text('STOP'),
+          )
+        : ElevatedButton(
+            // 若未計時，顯示開始鈕
+            onPressed: startCount,
+            child: Text('START'),
+          );
   }
 
   // timerUI
   Widget timerUI(String time) => Container(
-    color: Color.fromARGB(255, 245, 239, 223),
-    child: SizedBox(
-      height: 150,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [
-          // 顯示時間
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
+        color: Color.fromARGB(255, 245, 239, 223),
+        child: SizedBox(
+          height: 150,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Text(
-                time,
-                style: TextStyle(fontSize: 48),
+              // 顯示時間
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    time, // 顯示經過padLeftTime()對齊過的時間
+                    style: TextStyle(fontSize: 48),
+                  ),
+                ],
               ),
+              buildButton() // 開始、停止、取消鈕
             ],
           ),
-          buildButton() // 開始、停止、取消鈕
-        ],
-      ),
-    ),
-  );
+        ),
+      );
 }
