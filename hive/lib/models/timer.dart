@@ -1,3 +1,4 @@
+import 'package:Isar/pages/notes_pages.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:Isar/models/note_database.dart';
@@ -10,9 +11,9 @@ class BuildTimer extends ChangeNotifier {
   bool isRunning = false;
   bool isCountDown = false;
   Duration duration = Duration();
+  Duration saveTime = Duration();
   Duration countDownDuration = Duration(minutes: 1, seconds: 0);
   Timer? timer;
-  int saveTime = 0;
 
   // 正計時 增加時間
   void _addTime() {
@@ -40,11 +41,12 @@ class BuildTimer extends ChangeNotifier {
   void stopTimer() {
     isRunning = false;
     timer?.cancel();
-    saveTime = duration.inSeconds; // 紀錄時間
+    saveTime = duration; // 紀錄時間
     duration = Duration(); // 歸零
 
     // 新增計時紀錄到資料庫
-    context.read<NoteDataBase>().addNote(saveTime.toString());
+    String planName = context.read<PlanNameNotifier>().planName; // 取得當前的計畫名稱
+    context.read<NoteDataBase>().addNote(planName, saveTime);
     notifyListeners(); // 更新畫面
   }
 

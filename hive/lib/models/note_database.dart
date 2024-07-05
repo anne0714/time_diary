@@ -18,10 +18,19 @@ class NoteDataBase extends ChangeNotifier {
   // list of notes
   final List<Note> notesList = [];
 
+  //把時間變2位數，顯示數字
+  String padLeftTime(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String minutes = twoDigits(duration.inMinutes.remainder(60)); //取除以60的餘數
+    String seconds = twoDigits(duration.inSeconds.remainder(60));
+
+    return minutes + ':' + seconds;
+  }
+
   // Create - a note and save to db
-  Future<void> addNote(String textFromUser) async {
+  Future<void> addNote(String planName, Duration time) async {
     // create a new note object
-    final newNote = Note()..text = textFromUser;
+    final newNote = Note()..text = "$planName 進行時間: ${padLeftTime(time)}";
 
     // save to db 把newNote寫進isar資料庫中的notes表
     await isar.writeTxn(() => isar.notes.put(newNote));

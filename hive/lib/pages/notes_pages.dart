@@ -25,7 +25,7 @@ class NotesPage extends StatelessWidget {
     final textController = TextEditingController();
 
     // create a note
-    void createNote() {
+    /*void createNote() {
       // 顯示對話框
       showDialog(
           context: context,
@@ -50,7 +50,7 @@ class NotesPage extends StatelessWidget {
                   )
                 ],
               ));
-    }
+    }*/
 
     // 存取資料
     void readNotes() {

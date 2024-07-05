@@ -14,10 +14,10 @@ void main() async {
       create: (context) => NoteDataBase(),
     ),
     ChangeNotifierProvider(
-      create: (context) => BuildTimer(context),
+      create: (context) => PlanNameNotifier(),
     ),
     ChangeNotifierProvider(
-      create: (context) => PlanNameNotifier(),
+      create: (context) => BuildTimer(context),
     ),
   ], child: const MainApp()));
 }
