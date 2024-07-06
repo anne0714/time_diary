@@ -77,7 +77,7 @@ class BuildTimer extends ChangeNotifier {
   Widget timerUI(String time) => Container(
         color: Color.fromARGB(255, 245, 239, 223),
         child: SizedBox(
-          height: 150,
+          height: 125,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [

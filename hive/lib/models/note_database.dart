@@ -11,8 +11,10 @@ class NoteDataBase extends ChangeNotifier {
   static Future<void> initialize() async {
     final dir =
         await getApplicationDocumentsDirectory(); // 要在yaml中引入path_provider: 抓資料存放的位置
-    isar = await Isar.open([NoteSchema],
-        directory: dir.path); // NoteSchema 從 note.g.dart中自動生成[自訂類別名稱]Schema
+    isar = await Isar.open(
+      [NoteSchema],
+      directory: dir.path,
+    ); // NoteSchema 從 note.g.dart中自動生成[自訂類別名稱]Schema
   }
 
   // list of notes
@@ -29,8 +31,8 @@ class NoteDataBase extends ChangeNotifier {
 
   // Create - a note and save to db
   Future<void> addNote(String planName, Duration time) async {
-    // create a new note object
-    final newNote = Note()..text = "$planName 進行時間: ${padLeftTime(time)}";
+    // create a new note object (計畫名稱 + 進行時間)把時間轉換成字串
+    final newNote = Note()..text = "$planName ${padLeftTime(time)}";
 
     // save to db 把newNote寫進isar資料庫中的notes表
     await isar.writeTxn(() => isar.notes.put(newNote));

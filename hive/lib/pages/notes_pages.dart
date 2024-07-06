@@ -101,41 +101,6 @@ class NotesPage extends StatelessWidget {
     // create the list of notes
     List<Note> notesList = noteDatabase.notesList;
 
-    // noteslist UI 用一個ListView顯示資料列表
-    Widget notesListUI() => Expanded(
-          child: SizedBox(
-            height: 100,
-            child: ListView.builder(
-                itemCount: notesList.length,
-                itemBuilder: (context, index) {
-                  // get individual note
-                  final note = notesList[index];
-
-                  // list tile UI
-                  return ListTile(
-                    title: Text(
-                      note.text,
-                      style: TextStyle(fontSize: 28),
-                    ),
-                    trailing: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        // edit buttom
-                        IconButton(
-                            onPressed: () => updateNote(note),
-                            icon: const Icon(Icons.edit)),
-
-                        // delete buttom
-                        IconButton(
-                            onPressed: () => deleteNote(note.id),
-                            icon: const Icon(Icons.delete))
-                      ],
-                    ),
-                  );
-                }),
-          ),
-        );
-
     // 改計畫名稱
     void changePlanName() {
       textController.text = planName;
@@ -143,6 +108,7 @@ class NotesPage extends StatelessWidget {
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
+                title: const Text("更改計畫名稱"),
                 content: TextField(
                   controller: textController,
                 ),
@@ -169,20 +135,51 @@ class NotesPage extends StatelessWidget {
     // BuildTimer buildTimer = context.watch<BuildTimer>();
 
     // UI
+    // noteslist UI 用一個ListView顯示資料列表
+    Widget notesListUI() => Expanded(
+          child: SizedBox(
+            height: 100,
+            child: ListView.builder(
+                itemCount: notesList.length,
+                itemBuilder: (context, index) {
+                  // get individual note
+                  final note = notesList[index];
+
+                  // list tile UI
+                  return ListTile(
+                    title: Text(
+                      note.text,
+                      style: TextStyle(fontSize: 18),
+                    ),
+                    trailing: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // edit buttom
+                        IconButton(
+                            onPressed: () => updateNote(note),
+                            icon: const Icon(Icons.edit)),
+
+                        // delete buttom
+                        IconButton(
+                            onPressed: () => deleteNote(note.id),
+                            icon: const Icon(Icons.delete))
+                      ],
+                    ),
+                  );
+                }),
+          ),
+        );
+
+    // 頁面UI
     return Scaffold(
       appBar: AppBar(
-        title: Text(
+        title: const Text(
           '時間日記',
           style: TextStyle(
               fontSize: 30, color: Colors.white, fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
-        backgroundColor: Color.fromARGB(255, 132, 66, 255),
-      ),
-      // 更改計畫名稱按鈕
-      floatingActionButton: FloatingActionButton(
-        onPressed: changePlanName,
-        child: Icon(Icons.add),
+        backgroundColor: const Color.fromARGB(255, 132, 66, 255),
       ),
       body: Column(children: [
         notesListUI(),
@@ -191,17 +188,32 @@ class NotesPage extends StatelessWidget {
           color: const Color.fromARGB(255, 245, 239, 223),
           child: SizedBox(
             width: 393,
-            height: 25,
-            child: Center(
+            height: 40,
+            child: TextButton(
                 child: Selector<PlanNameNotifier, String>(
                     selector: (context, planNameNotifier) =>
                         planNameNotifier.planName,
                     builder: (context, planName, child) {
+                      // 顯示計畫名稱
                       return Text(
-                        planName, // 顯示計畫名稱
-                        style: TextStyle(fontSize: 20),
+                        planName,
                       );
-                    })),
+                    }),
+                style: TextButton.styleFrom(
+                    padding: EdgeInsets.zero,
+                    foregroundColor: Colors.grey[800],
+                    textStyle: TextStyle(fontSize: 20.0)),
+                // 按鈕按下後去計劃列表頁面
+                onPressed: () async {
+                  // 使用 Navigator.push 傳遞 context 讀取選中的計畫名稱
+                  final selectedPlanName =
+                      await Navigator.pushNamed(context, '/planslistpage');
+                  if (selectedPlanName != null && selectedPlanName is String) {
+                    context
+                        .read<PlanNameNotifier>()
+                        .setPlanName(selectedPlanName);
+                  }
+                }),
           ),
         ),
         Consumer<BuildTimer>(
