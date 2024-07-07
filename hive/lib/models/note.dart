@@ -7,7 +7,8 @@ part 'note.g.dart';
 
 @Collection()
 class Note {
-  // 自訂的Note類別，裡面只有ID、文字兩種屬性
+  // 自訂的Note類別，裡面有ID、計畫標題、時間長度
   Id id = Isar.autoIncrement; // 每增加1筆資料，ID會自動+1
   late String text; // 稍後才會得到資料的變數，前面要加late
+  late int seconds; // 時間長度(存秒數)
 }

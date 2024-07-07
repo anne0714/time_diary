@@ -20,7 +20,7 @@ void main() async {
       create: (context) => PlanDataBase(),
     ),
     ChangeNotifierProvider(
-      create: (context) => PlanNameNotifier(),
+      create: (context) => PlanNotifier(),
     ),
     ChangeNotifierProvider(
       create: (context) => BuildTimer(context),
@@ -35,6 +35,8 @@ class MainApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      theme: new ThemeData(
+          scaffoldBackgroundColor: Color.fromARGB(255, 255, 255, 255)),
       home: NotesPage(),
       routes: {
         '/planslistpage': (context) => PlansListPage(),

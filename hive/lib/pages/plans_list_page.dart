@@ -28,7 +28,7 @@ class PlansListPage extends StatelessWidget {
       showDialog(
           context: context,
           builder: (context) => AlertDialog(
-                title: Text("更新計畫名稱"),
+                title: Text("更改計畫名稱"),
                 content: TextField(
                   controller: textController,
                 ),
@@ -87,6 +87,7 @@ class PlansListPage extends StatelessWidget {
     return Scaffold(
         appBar: AppBar(
           title: const Text("計畫列表"),
+          backgroundColor: Colors.white,
         ),
         // 新增計畫按鈕
         floatingActionButton: FloatingActionButton(
@@ -95,6 +96,17 @@ class PlansListPage extends StatelessWidget {
         ),
         body: Column(
           children: [
+            Padding(
+              padding: const EdgeInsets.only(top: 10, left: 16),
+              child: Row(
+                children: [
+                  Icon(Icons.list_rounded, size: 20, color: Colors.grey[600]),
+                  SizedBox(width: 5),
+                  Text('請選擇1項計畫',
+                      style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+                ],
+              ),
+            ),
             Expanded(
               child: SizedBox(
                 height: 100,

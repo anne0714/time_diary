@@ -31,9 +31,11 @@ class NoteDataBase extends ChangeNotifier {
 
   // Create - a note and save to db
   Future<void> addNote(String planName, Duration time) async {
-    // create a new note object (計畫名稱 + 進行時間)把時間轉換成字串
-    final newNote = Note()..text = "$planName ${padLeftTime(time)}";
-
+    // create a new note object (計畫名稱)
+    final newNote = Note();
+    newNote.text = planName;
+    // 把紀錄秒數存到Note中
+    newNote.seconds = time.inSeconds;
     // save to db 把newNote寫進isar資料庫中的notes表
     await isar.writeTxn(() => isar.notes.put(newNote));
 

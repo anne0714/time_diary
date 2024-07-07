@@ -1,10 +1,12 @@
 import 'package:Isar/models/note_database.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:provider/provider.dart';
 import 'package:Isar/models/note.dart';
 import 'package:Isar/models/timer.dart';
 
-class PlanNameNotifier extends ChangeNotifier {
+class PlanNotifier extends ChangeNotifier {
   String _planName = '計畫名稱';
 
   String get planName => _planName;
@@ -13,44 +15,33 @@ class PlanNameNotifier extends ChangeNotifier {
     _planName = newName;
     notifyListeners();
   }
+
+  String _planNameGoal = '計畫名稱';
+
+  String get planNameGoal => _planNameGoal;
+
+  void setPlanNameGoal(String newName) {
+    _planNameGoal = newName;
+    notifyListeners();
+  }
+
+  Duration _duration = Duration();
+  Duration get duration => _duration;
+
+  void setDuration(Duration newDuration) {
+    _duration = newDuration;
+    notifyListeners();
+  }
 }
 
 class NotesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 監聽計畫名稱
-    final planNameNotifier = context.watch<PlanNameNotifier>();
-    final planName = planNameNotifier.planName;
+    final planNameNotifier = context.watch<PlanNotifier>();
+    Duration goalDuration = planNameNotifier.duration;
     // Text controller 偵測文字輸入
     final textController = TextEditingController();
-
-    // create a note
-    /*void createNote() {
-      // 顯示對話框
-      showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                content: TextField(
-                  controller: textController,
-                ),
-                actions: [
-                  // create buttom
-                  MaterialButton(
-                    onPressed: () {
-                      // add to db
-                      context.read<NoteDataBase>().addNote(textController.text);
-
-                      // clear controller 每次送出資料後，把文字輸入框清掉
-                      textController.clear();
-
-                      // pop dialog box 關閉對話框
-                      Navigator.pop(context);
-                    },
-                    child: const Text("create"),
-                  )
-                ],
-              ));
-    }*/
 
     // 存取資料
     void readNotes() {
@@ -101,40 +92,34 @@ class NotesPage extends StatelessWidget {
     // create the list of notes
     List<Note> notesList = noteDatabase.notesList;
 
-    // 改計畫名稱
-    void changePlanName() {
-      textController.text = planName;
-      // 顯示對話框
-      showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                title: const Text("更改計畫名稱"),
-                content: TextField(
-                  controller: textController,
-                ),
-                actions: [
-                  // 更改計畫名稱按鈕
-                  MaterialButton(
-                    onPressed: () {
-                      // 用context.read取得PlanNameNotifier物件，並用setPlanName方法更新計畫名稱
-                      context
-                          .read<PlanNameNotifier>()
-                          .setPlanName(textController.text);
-                      // clear controller 每次送出資料後，把文字輸入框清掉
-                      textController.clear();
-                      // pop dialog box 關閉對話框
-                      Navigator.pop(context);
-                    },
-                    child: const Text("確認"),
-                  )
-                ],
-              ));
-    }
-
     // BuildTimer計時器物件 建立時要加上 context.watch 監聽BuildTimer的變化！
     // BuildTimer buildTimer = context.watch<BuildTimer>();
 
     // UI
+    // 選擇時間長度
+    void selectTimeLength() {
+      showCupertinoModalPopup(
+          context: context,
+          builder: (context) {
+            return Container(
+                height: 200,
+                color: Colors.white,
+                child: Column(
+                  children: [
+                    Expanded(
+                      child: CupertinoTimerPicker(
+                          mode: CupertinoTimerPickerMode.hm,
+                          initialTimerDuration: goalDuration,
+                          // duration為選擇後的時間長度
+                          onTimerDurationChanged: (Duration duration) {
+                            context.read<PlanNotifier>().setDuration(duration);
+                          }),
+                    )
+                  ],
+                ));
+          });
+    }
+
     // noteslist UI 用一個ListView顯示資料列表
     Widget notesListUI() => Expanded(
           child: SizedBox(
@@ -148,7 +133,8 @@ class NotesPage extends StatelessWidget {
                   // list tile UI
                   return ListTile(
                     title: Text(
-                      note.text,
+                      // 計畫名稱 + 紀錄時間
+                      '${note.text} ${BuildTimer.secToPadLeftTime(note.seconds)}',
                       style: TextStyle(fontSize: 18),
                     ),
                     trailing: Row(
@@ -176,53 +162,101 @@ class NotesPage extends StatelessWidget {
         title: const Text(
           '時間日記',
           style: TextStyle(
-              fontSize: 30, color: Colors.white, fontWeight: FontWeight.w600),
+              fontSize: 30,
+              color: Color.fromARGB(255, 61, 61, 61),
+              fontWeight: FontWeight.w600),
         ),
         centerTitle: true,
-        backgroundColor: const Color.fromARGB(255, 132, 66, 255),
+        backgroundColor: Color.fromARGB(255, 255, 255, 255),
       ),
-      body: Column(children: [
+      body: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // 目標執行時間
+            pickPlan(context, 'goal'),
+            Text(
+                '${goalDuration.inHours}小時${goalDuration.inMinutes % 60}分${goalDuration.inSeconds % 60}秒',
+                style: TextStyle(fontSize: 40)),
+            ElevatedButton(
+                onPressed: selectTimeLength, child: Text('選擇目標執行時間')),
+          ],
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 10, left: 16),
+          child: Row(
+            children: [
+              Icon(Icons.access_time_rounded,
+                  size: 20, color: Colors.grey[600]),
+              SizedBox(width: 5),
+              Text('最近的紀錄',
+                  style: TextStyle(fontSize: 20, color: Colors.grey[600])),
+            ],
+          ),
+        ),
         notesListUI(),
+        // 正計時
         Container(
           padding: const EdgeInsets.only(top: 10),
           color: const Color.fromARGB(255, 245, 239, 223),
-          child: SizedBox(
-            width: 393,
-            height: 40,
-            child: TextButton(
-                child: Selector<PlanNameNotifier, String>(
-                    selector: (context, planNameNotifier) =>
-                        planNameNotifier.planName,
-                    builder: (context, planName, child) {
-                      // 顯示計畫名稱
-                      return Text(
-                        planName,
-                      );
-                    }),
-                style: TextButton.styleFrom(
-                    padding: EdgeInsets.zero,
-                    foregroundColor: Colors.grey[800],
-                    textStyle: TextStyle(fontSize: 20.0)),
-                // 按鈕按下後去計劃列表頁面
-                onPressed: () async {
-                  // 使用 Navigator.push 傳遞 context 讀取選中的計畫名稱
-                  final selectedPlanName =
-                      await Navigator.pushNamed(context, '/planslistpage');
-                  if (selectedPlanName != null && selectedPlanName is String) {
-                    context
-                        .read<PlanNameNotifier>()
-                        .setPlanName(selectedPlanName);
-                  }
-                }),
-          ),
+          child:
+              // 選擇計畫名稱
+              SizedBox(
+                  width: 393, height: 40, child: pickPlan(context, 'timer')),
         ),
+        // 計時器UI(開始、停止鍵、時間顯示)
         Consumer<BuildTimer>(
           builder: (context, buildTimer, child) {
             return buildTimer
-                .timerUI(buildTimer.padLeftTime()); // 計時器UI(開始、停止鍵、時間顯示)
+                .timerUI(BuildTimer.padLeftTime(buildTimer.duration));
           },
         )
       ]),
     );
+  }
+
+  // 選擇計畫名稱 用usefor判斷是選擇計時器的計畫，還是目標執行時間的計畫
+  TextButton pickPlan(BuildContext context, String usefor) {
+    return TextButton(
+        child: usefor == 'timer' ? planNameTimer() : planNameGoal(),
+        style: TextButton.styleFrom(
+            padding: EdgeInsets.zero,
+            foregroundColor: Colors.grey[800],
+            textStyle: TextStyle(fontSize: 20.0)),
+        // 按鈕按下後去計劃列表頁面
+        onPressed: () async {
+          // 使用 Navigator.push 傳遞 context 讀取選中的計畫名稱
+          final selectedPlanName =
+              await Navigator.pushNamed(context, '/planslistpage');
+          if (selectedPlanName != null && selectedPlanName is String) {
+            usefor == 'timer'
+                ? context.read<PlanNotifier>().setPlanName(selectedPlanName)
+                : context
+                    .read<PlanNotifier>()
+                    .setPlanNameGoal(selectedPlanName);
+          }
+        });
+  }
+
+  Selector<PlanNotifier, String> planNameTimer() {
+    return Selector<PlanNotifier, String>(
+        selector: (context, planNameNotifier) => planNameNotifier.planName,
+        builder: (context, planName, child) {
+          // 顯示計畫名稱
+          return Text(
+            planName,
+          );
+        });
+  }
+
+  Selector<PlanNotifier, String> planNameGoal() {
+    return Selector<PlanNotifier, String>(
+        selector: (context, planNameNotifier) => planNameNotifier.planNameGoal,
+        builder: (context, planName, child) {
+          // 顯示計畫名稱
+          return Text(
+            planName,
+          );
+        });
   }
 }

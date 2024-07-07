@@ -45,18 +45,26 @@ class BuildTimer extends ChangeNotifier {
     duration = Duration(); // 歸零
 
     // 新增計時紀錄到資料庫
-    String planName = context.read<PlanNameNotifier>().planName; // 取得當前的計畫名稱
+    String planName = context.read<PlanNotifier>().planName; // 取得當前的計畫名稱
     context.read<NoteDataBase>().addNote(planName, saveTime);
     notifyListeners(); // 更新畫面
   }
 
   //把時間變2位數，顯示數字
-  String padLeftTime() {
+  static String padLeftTime(Duration inputDuration) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
-    String minutes = twoDigits(duration.inMinutes.remainder(60)); //取除以60的餘數
-    String seconds = twoDigits(duration.inSeconds.remainder(60));
+    String hours = twoDigits(inputDuration.inHours); //小時
+    String minutes =
+        twoDigits(inputDuration.inMinutes.remainder(60)); //取除以60的餘數
+    String seconds = twoDigits(inputDuration.inSeconds.remainder(60));
+    return hours + ':' + minutes + ':' + seconds;
+  }
 
-    return minutes + ':' + seconds;
+  // 把整數秒數變duration時間格式
+  static String secToPadLeftTime(int seconds) {
+    Duration newDuration = Duration(seconds: seconds);
+    String padLeftTime = BuildTimer.padLeftTime(newDuration);
+    return padLeftTime;
   }
 
   // 切換開始、停止、取消鈕
