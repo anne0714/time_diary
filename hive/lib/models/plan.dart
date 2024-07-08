@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:isar/isar.dart';
 
 // 自動產生的檔案，Isar會自動創建資料庫
@@ -12,4 +13,5 @@ class Plan {
   late bool isGoal; // 是否有設定目標
   late int hours; // 每日目標時數
   late int mins; // 每日目標分鐘數
+  late Color color; // 顏色
 }

@@ -31,16 +31,38 @@ class _AddPlanPageState extends State<AddPlanPage> {
   bool isGoal = false;
   Duration goalDuration = Duration();
   final TextEditingController textController = TextEditingController();
+  Color color = Colors.redAccent;
+  IconData icon = Icons.circle_rounded;
 
   void selectTimeLength(BuildContext context) {
     showCupertinoModalPopup(
       context: context,
       builder: (context) {
         return Container(
-          height: 200,
+          height: 240,
           color: Colors.white,
           child: Column(
             children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Text('計畫每日的目標時長',
+                        style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.black,
+                            fontWeight: FontWeight.normal,
+                            decoration: TextDecoration.none)),
+                    CupertinoButton(
+                        child: Text('確定'),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        })
+                  ],
+                ),
+              ),
               Expanded(
                 child: CupertinoTimerPicker(
                   mode: CupertinoTimerPickerMode.hm,
@@ -117,17 +139,23 @@ class _AddPlanPageState extends State<AddPlanPage> {
                     child: Text('修改時長')),
               ],
             ),
-            ElevatedButton(
-              onPressed: () {
-                int hours = goalDuration.inHours;
-                int mins = goalDuration.inMinutes % 60;
-                context
-                    .read<PlanDataBase>()
-                    .addPlan(textController.text, isGoal, hours, mins);
-                textController.clear();
-                Navigator.pop(context);
-              },
-              child: const Text("確定"),
+            PickColor(),
+            SizedBox(height: 30),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                ElevatedButton(
+                  onPressed: () {
+                    int hours = goalDuration.inHours;
+                    int mins = goalDuration.inMinutes % 60;
+                    context.read<PlanDataBase>().addPlan(
+                        textController.text, isGoal, hours, mins, color);
+                    textController.clear();
+                    Navigator.pop(context);
+                  },
+                  child: const Text("確定"),
+                ),
+              ],
             ),
           ],
         ),
@@ -146,13 +174,63 @@ class GoalSwitch extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Text("每日目標"),
+        Text("每日執行目標"),
         SizedBox(width: 10),
         Switch(
           value: isGoal,
           onChanged: onChanged,
         ),
       ],
+    );
+  }
+}
+
+// 選擇計畫的顏色
+class PickColor extends StatefulWidget {
+  const PickColor({super.key});
+
+  @override
+  State<PickColor> createState() => _PickColorState();
+}
+
+class _PickColorState extends State<PickColor> {
+  int selectedIndex = 0; // 初始化為選擇紅色
+
+  @override
+  Widget build(BuildContext context) {
+    List<Color> colors = [
+      Colors.redAccent,
+      Colors.green,
+      Colors.blue,
+      Colors.yellow,
+      Colors.orange,
+    ];
+    return Container(
+      height: 50,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        itemCount: colors.length,
+        itemBuilder: (context, index) => GestureDetector(
+            onTap: () {
+              setState(() {
+                selectedIndex = index;
+              });
+            },
+            child: Container(
+                width: 40,
+                height: 40,
+                child: selectedIndex == index
+                    ? Icon(
+                        Icons.check_circle_rounded,
+                        color: colors[index],
+                        size: 30,
+                      )
+                    : Icon(
+                        Icons.circle_rounded,
+                        color: colors[index],
+                        size: 30,
+                      ))),
+      ),
     );
   }
 }
