@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../models/plan.dart';
@@ -59,28 +60,7 @@ class PlansListPage extends StatelessWidget {
     // 新增計畫
     void addPlan() {
       textController.clear();
-      showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-                title: Text("新增計畫"),
-                content: TextField(
-                  controller: textController,
-                ),
-                actions: [
-                  // add buttom
-                  MaterialButton(
-                    onPressed: () {
-                      // add Plan in db
-                      context.read<PlanDataBase>().addPlan(textController.text);
-                      // clear controller
-                      textController.clear();
-                      // pop dialog box
-                      Navigator.pop(context);
-                    },
-                    child: const Text("確定"),
-                  )
-                ],
-              ));
+      Navigator.pushNamed(context, '/addplanpage');
     }
 
     // UI
@@ -120,7 +100,11 @@ class PlansListPage extends StatelessWidget {
                       return ListTile(
                         // 計畫名稱
                         title: Text(
-                          plan.name,
+                          plan.name +
+                              plan.hours.toString() +
+                              '小時' +
+                              plan.mins.toString() +
+                              '分',
                           style: TextStyle(fontSize: 18),
                         ),
                         // 點擊選取該計畫名稱，返回紀錄頁面
@@ -147,5 +131,138 @@ class PlansListPage extends StatelessWidget {
             ),
           ],
         ));
+  }
+}
+
+class AddPlanDialog extends StatefulWidget {
+  final TextEditingController textController;
+
+  AddPlanDialog({required this.textController});
+
+  @override
+  _AddPlanDialogState createState() => _AddPlanDialogState();
+}
+
+class _AddPlanDialogState extends State<AddPlanDialog> {
+  bool isGoal = false;
+  Duration goalDuration = Duration();
+
+  void selectTimeLength(BuildContext context) {
+    showCupertinoModalPopup(
+      context: context,
+      builder: (context) {
+        return Container(
+          height: 200,
+          color: Colors.white,
+          child: Column(
+            children: [
+              Expanded(
+                child: CupertinoTimerPicker(
+                  mode: CupertinoTimerPickerMode.hm,
+                  initialTimerDuration: goalDuration,
+                  // duration為選擇後的時間長度
+                  onTimerDurationChanged: (Duration duration) {
+                    setState(() {
+                      goalDuration = duration;
+                      isGoal = true;
+                    });
+                  },
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: Text("新增計畫"),
+      content: Container(
+        height: isGoal ? 180 : 180,
+        width: isGoal ? 200 : 200,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text("計畫名稱"),
+            TextField(
+              controller: widget.textController,
+            ),
+            SizedBox(height: 10),
+            GoalSwitch(
+              isGoal: isGoal,
+              onChanged: (value) {
+                // 如果不勾選每日目標，清空時間長度
+                if (value == false) {
+                  setState(() {
+                    isGoal = value;
+                    goalDuration = Duration();
+                  });
+                } else
+                  setState(() {
+                    isGoal = value;
+                    selectTimeLength(context);
+                  });
+              },
+            ),
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  goalDuration.inHours.toString() +
+                      '小時' +
+                      (goalDuration.inMinutes % 60).toString() +
+                      '分',
+                  style: TextStyle(fontSize: 20),
+                ),
+                SizedBox(width: 10),
+                ElevatedButton(
+                    onPressed: () {
+                      selectTimeLength(context);
+                    },
+                    child: Text('修改時長')),
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        MaterialButton(
+          onPressed: () {
+            int hours = goalDuration.inHours;
+            int mins = goalDuration.inMinutes % 60;
+            context
+                .read<PlanDataBase>()
+                .addPlan(widget.textController.text, isGoal, hours, mins);
+            widget.textController.clear();
+            Navigator.pop(context);
+          },
+          child: const Text("確定"),
+        ),
+      ],
+    );
+  }
+}
+
+class GoalSwitch extends StatelessWidget {
+  final bool isGoal;
+  final ValueChanged<bool> onChanged;
+
+  GoalSwitch({required this.isGoal, required this.onChanged});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Text("每日目標"),
+        SizedBox(width: 10),
+        Switch(
+          value: isGoal,
+          onChanged: onChanged,
+        ),
+      ],
+    );
   }
 }

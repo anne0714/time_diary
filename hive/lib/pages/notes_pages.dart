@@ -16,6 +16,7 @@ class PlanNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 目標計畫名稱
   String _planNameGoal = '計畫名稱';
 
   String get planNameGoal => _planNameGoal;
@@ -25,6 +26,7 @@ class PlanNotifier extends ChangeNotifier {
     notifyListeners();
   }
 
+  // 目標執行時間長度
   Duration _duration = Duration();
   Duration get duration => _duration;
 

@@ -20,10 +20,14 @@ class PlanDataBase extends ChangeNotifier {
   final List<Plan> plansList = [];
 
   // Create
-  Future<void> addPlan(String planName) async {
+  Future<void> addPlan(
+      String planName, bool isGoal, int hours, int mins) async {
     // 新增計畫物件
     final newPlan = Plan()..name = planName;
-
+    // 是否有目標執行時間
+    newPlan.isGoal = isGoal;
+    newPlan.hours = hours;
+    newPlan.mins = mins;
     // save to db 把newPlan寫進isar資料庫中的plans表
     await isar.writeTxn(() => isar.plans.put(newPlan));
 

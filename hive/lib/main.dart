@@ -3,6 +3,7 @@ import 'package:Isar/models/timer.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'models/plan_db.dart';
+import 'pages/add_plan_page.dart';
 import 'pages/notes_pages.dart';
 import 'pages/plans_list_page.dart';
 
@@ -40,7 +41,8 @@ class MainApp extends StatelessWidget {
       home: NotesPage(),
       routes: {
         '/planslistpage': (context) => PlansListPage(),
-        '/notespage': (context) => NotesPage()
+        '/notespage': (context) => NotesPage(),
+        '/addplanpage': (context) => AddPlanPage(),
       },
     );
   }
