@@ -28,7 +28,7 @@ class PlanDataBase extends ChangeNotifier {
     newPlan.isGoal = isGoal;
     newPlan.hours = hours;
     newPlan.mins = mins;
-    newPlan.color = color;
+    newPlan.color = color.value;
     // save to db 把newPlan寫進isar資料庫中的plans表
     await isar.writeTxn(() => isar.plans.put(newPlan));
 

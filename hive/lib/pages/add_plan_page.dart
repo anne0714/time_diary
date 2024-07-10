@@ -31,7 +31,7 @@ class _AddPlanPageState extends State<AddPlanPage> {
   bool isGoal = false;
   Duration goalDuration = Duration();
   final TextEditingController textController = TextEditingController();
-  Color color = Colors.redAccent;
+  Color color = Color.fromARGB(255, 255, 159, 159);
   IconData icon = Icons.circle_rounded;
 
   void selectTimeLength(BuildContext context) {
@@ -92,78 +92,90 @@ class _AddPlanPageState extends State<AddPlanPage> {
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("計畫名稱"),
-            TextField(
-              // 提示輸入文字
-              decoration: new InputDecoration(
-                  hintText: "請輸入計畫名稱",
-                  hintStyle: TextStyle(color: Colors.grey[500])),
-              focusNode: myFocusNode,
-              controller: textController,
-            ),
-            SizedBox(height: 10),
-            GoalSwitch(
-              isGoal: isGoal,
-              onChanged: (value) {
-                // 如果不勾選每日目標，清空時間長度
-                if (value == false) {
-                  setState(() {
-                    isGoal = value;
-                    goalDuration = Duration();
-                  });
-                } else
-                  setState(() {
-                    isGoal = value;
-                    selectTimeLength(context);
-                  });
-              },
-            ),
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                Text(
-                  goalDuration.inHours.toString() +
-                      '小時' +
-                      (goalDuration.inMinutes % 60).toString() +
-                      '分',
-                  style: TextStyle(fontSize: 20),
-                ),
-                SizedBox(width: 10),
-                ElevatedButton(
-                    onPressed: () {
+        // 用SingleChildScrollView包裝Column，鍵盤彈出來的時候畫面不會溢出，因為畫面可以捲動
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("計畫名稱"),
+              TextField(
+                // 提示輸入文字
+                decoration: new InputDecoration(
+                    hintText: "請輸入計畫名稱",
+                    hintStyle: TextStyle(color: Colors.grey[500])),
+                focusNode: myFocusNode,
+                controller: textController,
+              ),
+              SizedBox(height: 10),
+              GoalSwitch(
+                isGoal: isGoal,
+                onChanged: (value) {
+                  // 如果不勾選每日目標，清空時間長度
+                  if (value == false) {
+                    setState(() {
+                      isGoal = value;
+                      goalDuration = Duration();
+                    });
+                  } else
+                    setState(() {
+                      isGoal = value;
                       selectTimeLength(context);
+                    });
+                },
+              ),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  Text(
+                    goalDuration.inHours.toString() +
+                        '小時' +
+                        (goalDuration.inMinutes % 60).toString() +
+                        '分',
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(width: 10),
+                  ElevatedButton(
+                      onPressed: () {
+                        selectTimeLength(context);
+                      },
+                      child: Text('修改時長')),
+                ],
+              ),
+              // 顏色選擇
+              PickColor(
+                // selectedColor為PickColor傳回的顏色變數，再存回color中
+                onColorSelected: (selectedColor) {
+                  setState(() {
+                    color = selectedColor;
+                  });
+                },
+              ),
+              SizedBox(height: 30),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      int hours = goalDuration.inHours;
+                      int mins = goalDuration.inMinutes % 60;
+                      context.read<PlanDataBase>().addPlan(
+                          textController.text, isGoal, hours, mins, color);
+                      textController.clear();
+                      Navigator.pop(context);
                     },
-                    child: Text('修改時長')),
-              ],
-            ),
-            PickColor(),
-            SizedBox(height: 30),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                ElevatedButton(
-                  onPressed: () {
-                    int hours = goalDuration.inHours;
-                    int mins = goalDuration.inMinutes % 60;
-                    context.read<PlanDataBase>().addPlan(
-                        textController.text, isGoal, hours, mins, color);
-                    textController.clear();
-                    Navigator.pop(context);
-                  },
-                  child: const Text("確定"),
-                ),
-              ],
-            ),
-          ],
+                    child: const Text("確定"),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 }
 
+// 勾選是否為每日目標
 class GoalSwitch extends StatelessWidget {
   final bool isGoal;
   final ValueChanged<bool> onChanged;
@@ -187,7 +199,10 @@ class GoalSwitch extends StatelessWidget {
 
 // 選擇計畫的顏色
 class PickColor extends StatefulWidget {
-  const PickColor({super.key});
+  // 回調函數，傳入父組件顏色變數，當選擇顏色時，會呼叫此函式傳回選擇的顏色
+  final ValueChanged<Color> onColorSelected;
+
+  const PickColor({Key? key, required this.onColorSelected}) : super(key: key);
 
   @override
   State<PickColor> createState() => _PickColorState();
@@ -199,11 +214,11 @@ class _PickColorState extends State<PickColor> {
   @override
   Widget build(BuildContext context) {
     List<Color> colors = [
-      Colors.redAccent,
-      Colors.green,
-      Colors.blue,
-      Colors.yellow,
-      Colors.orange,
+      Color.fromARGB(255, 255, 159, 159),
+      Color.fromARGB(255, 183, 233, 103),
+      Color.fromARGB(255, 136, 195, 243),
+      Color.fromARGB(255, 253, 204, 69),
+      Color.fromARGB(255, 250, 147, 87),
     ];
     return Container(
       height: 50,
@@ -214,6 +229,7 @@ class _PickColorState extends State<PickColor> {
             onTap: () {
               setState(() {
                 selectedIndex = index;
+                widget.onColorSelected(colors[index]);
               });
             },
             child: Container(

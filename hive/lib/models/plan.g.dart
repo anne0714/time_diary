@@ -17,23 +17,28 @@ const PlanSchema = CollectionSchema(
   name: r'Plan',
   id: 8143067535675439181,
   properties: {
-    r'hours': PropertySchema(
+    r'color': PropertySchema(
       id: 0,
+      name: r'color',
+      type: IsarType.long,
+    ),
+    r'hours': PropertySchema(
+      id: 1,
       name: r'hours',
       type: IsarType.long,
     ),
     r'isGoal': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'isGoal',
       type: IsarType.bool,
     ),
     r'mins': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'mins',
       type: IsarType.long,
     ),
     r'name': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'name',
       type: IsarType.string,
     )
@@ -68,10 +73,11 @@ void _planSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeLong(offsets[0], object.hours);
-  writer.writeBool(offsets[1], object.isGoal);
-  writer.writeLong(offsets[2], object.mins);
-  writer.writeString(offsets[3], object.name);
+  writer.writeLong(offsets[0], object.color);
+  writer.writeLong(offsets[1], object.hours);
+  writer.writeBool(offsets[2], object.isGoal);
+  writer.writeLong(offsets[3], object.mins);
+  writer.writeString(offsets[4], object.name);
 }
 
 Plan _planDeserialize(
@@ -81,11 +87,12 @@ Plan _planDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Plan();
-  object.hours = reader.readLong(offsets[0]);
+  object.color = reader.readLong(offsets[0]);
+  object.hours = reader.readLong(offsets[1]);
   object.id = id;
-  object.isGoal = reader.readBool(offsets[1]);
-  object.mins = reader.readLong(offsets[2]);
-  object.name = reader.readString(offsets[3]);
+  object.isGoal = reader.readBool(offsets[2]);
+  object.mins = reader.readLong(offsets[3]);
+  object.name = reader.readString(offsets[4]);
   return object;
 }
 
@@ -99,10 +106,12 @@ P _planDeserializeProp<P>(
     case 0:
       return (reader.readLong(offset)) as P;
     case 1:
-      return (reader.readBool(offset)) as P;
-    case 2:
       return (reader.readLong(offset)) as P;
+    case 2:
+      return (reader.readBool(offset)) as P;
     case 3:
+      return (reader.readLong(offset)) as P;
+    case 4:
       return (reader.readString(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -197,6 +206,58 @@ extension PlanQueryWhere on QueryBuilder<Plan, Plan, QWhereClause> {
 }
 
 extension PlanQueryFilter on QueryBuilder<Plan, Plan, QFilterCondition> {
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> colorEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'color',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> colorGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'color',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> colorLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'color',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> colorBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'color',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
   QueryBuilder<Plan, Plan, QAfterFilterCondition> hoursEqualTo(int value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
@@ -496,6 +557,18 @@ extension PlanQueryObject on QueryBuilder<Plan, Plan, QFilterCondition> {}
 extension PlanQueryLinks on QueryBuilder<Plan, Plan, QFilterCondition> {}
 
 extension PlanQuerySortBy on QueryBuilder<Plan, Plan, QSortBy> {
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByColor() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'color', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByColorDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'color', Sort.desc);
+    });
+  }
+
   QueryBuilder<Plan, Plan, QAfterSortBy> sortByHours() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'hours', Sort.asc);
@@ -546,6 +619,18 @@ extension PlanQuerySortBy on QueryBuilder<Plan, Plan, QSortBy> {
 }
 
 extension PlanQuerySortThenBy on QueryBuilder<Plan, Plan, QSortThenBy> {
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByColor() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'color', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByColorDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'color', Sort.desc);
+    });
+  }
+
   QueryBuilder<Plan, Plan, QAfterSortBy> thenByHours() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'hours', Sort.asc);
@@ -608,6 +693,12 @@ extension PlanQuerySortThenBy on QueryBuilder<Plan, Plan, QSortThenBy> {
 }
 
 extension PlanQueryWhereDistinct on QueryBuilder<Plan, Plan, QDistinct> {
+  QueryBuilder<Plan, Plan, QDistinct> distinctByColor() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'color');
+    });
+  }
+
   QueryBuilder<Plan, Plan, QDistinct> distinctByHours() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'hours');
@@ -638,6 +729,12 @@ extension PlanQueryProperty on QueryBuilder<Plan, Plan, QQueryProperty> {
   QueryBuilder<Plan, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Plan, int, QQueryOperations> colorProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'color');
     });
   }
 

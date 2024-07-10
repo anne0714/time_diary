@@ -74,11 +74,11 @@ class PlansListPage extends StatelessWidget {
           onPressed: addPlan,
           child: Icon(Icons.add),
         ),
-        body: Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.only(top: 10, left: 16),
-              child: Row(
+        body: Padding(
+          padding: const EdgeInsets.only(top: 10, left: 16, right: 16),
+          child: Column(
+            children: [
+              Row(
                 children: [
                   Icon(Icons.list_rounded, size: 20, color: Colors.grey[600]),
                   SizedBox(width: 5),
@@ -86,50 +86,77 @@ class PlansListPage extends StatelessWidget {
                       style: TextStyle(fontSize: 20, color: Colors.grey[600])),
                 ],
               ),
-            ),
-            Expanded(
-              child: SizedBox(
-                height: 100,
-                child: ListView.builder(
-                    itemCount: plansList.length,
-                    itemBuilder: (context, index) {
-                      // get individual Plan
-                      final plan = plansList[index];
+              Expanded(
+                child: SizedBox(
+                  height: 100,
+                  child: ListView.separated(
+                      separatorBuilder: (context, index) =>
+                          SizedBox(height: 10),
+                      itemCount: plansList.length,
+                      itemBuilder: (context, index) {
+                        // get individual Plan
+                        final plan = plansList[index];
 
-                      // list tile UI
-                      return ListTile(
-                        // 計畫名稱
-                        title: Text(
-                          plan.name +
-                              plan.hours.toString() +
-                              '小時' +
-                              plan.mins.toString() +
-                              '分',
-                          style: TextStyle(fontSize: 18),
-                        ),
-                        // 點擊選取該計畫名稱，返回紀錄頁面
-                        onTap: () {
-                          Navigator.pop(context, plan.name);
-                        },
-                        trailing: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            // edit buttom
-                            IconButton(
-                                onPressed: () => updatePlan(plan),
-                                icon: const Icon(Icons.edit)),
+                        // list tile UI
+                        return Container(
+                          // 每個list背景顏色用plan.color決定 color不能和boxdecoration同時用
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(20),
+                            color: Color(plan.color),
+                            /*border:
+                                Border.all(color: Color(plan.color), width: 3),*/
+                          ),
+                          child: ListTile(
+                            dense: true,
+                            // 計畫名稱
+                            title: Text(
+                              plan.name +
+                                  plan.hours.toString() +
+                                  '小時' +
+                                  plan.mins.toString() +
+                                  '分 ',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                                shadows: [
+                                  Shadow(
+                                    blurRadius: 5.0,
+                                    color: Colors.grey[800]!,
+                                    offset: Offset(0.0, 1.0),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            // 點擊選取該計畫名稱，返回紀錄頁面
+                            onTap: () {
+                              Navigator.pop(context, plan.name);
+                            },
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                // edit buttom
+                                IconButton(
+                                    onPressed: () => updatePlan(plan),
+                                    icon: const Icon(
+                                      Icons.edit,
+                                      color: Colors.white,
+                                    )),
 
-                            // delete buttom
-                            IconButton(
-                                onPressed: () => deletePlan(plan.id),
-                                icon: const Icon(Icons.delete))
-                          ],
-                        ),
-                      );
-                    }),
+                                // delete buttom
+                                IconButton(
+                                    onPressed: () => deletePlan(plan.id),
+                                    icon: const Icon(Icons.delete,
+                                        color: Colors.white))
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ));
   }
 }
