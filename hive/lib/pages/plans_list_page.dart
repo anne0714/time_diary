@@ -40,7 +40,7 @@ class PlansListPage extends StatelessWidget {
                       // updata Plan in db
                       context
                           .read<PlanDataBase>()
-                          .updatePlan(Plan.id, textController.text);
+                          .updatePlanName(Plan.id, textController.text);
                       // clear controller
                       textController.clear();
                       // pop dialog box
@@ -110,21 +110,15 @@ class PlansListPage extends StatelessWidget {
                             dense: true,
                             // 計畫名稱
                             title: Text(
-                              plan.name +
-                                  plan.hours.toString() +
-                                  '小時' +
-                                  plan.mins.toString() +
-                                  '分 ',
+                              plan.name,
                               style: TextStyle(
                                 fontSize: 18,
                                 color: Colors.white,
                                 fontWeight: FontWeight.bold,
                                 shadows: [
                                   Shadow(
-                                    blurRadius: 5.0,
-                                    color: Colors.grey[800]!,
-                                    offset: Offset(0.0, 1.0),
-                                  ),
+                                      blurRadius: 5.0,
+                                      color: Colors.grey[800]!),
                                 ],
                               ),
                             ),

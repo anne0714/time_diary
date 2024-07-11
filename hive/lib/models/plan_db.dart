@@ -18,6 +18,7 @@ class PlanDataBase extends ChangeNotifier {
 
   // 存放計畫的列表
   final List<Plan> plansList = [];
+  final List<Plan> goalPlansList = [];
 
   // Create
   Future<void> addPlan(
@@ -28,6 +29,8 @@ class PlanDataBase extends ChangeNotifier {
     newPlan.isGoal = isGoal;
     newPlan.hours = hours;
     newPlan.mins = mins;
+    newPlan.leftHours = hours;
+    newPlan.leftMins = mins;
     newPlan.color = color.value;
     // save to db 把newPlan寫進isar資料庫中的plans表
     await isar.writeTxn(() => isar.plans.put(newPlan));
@@ -46,8 +49,19 @@ class PlanDataBase extends ChangeNotifier {
     notifyListeners(); // 讀取資料後刷新螢幕
   }
 
+  // Read
+  Future<void> fetchGoalPlans() async {
+    // 找到所有plans中的資料，傳入fetchplans
+    List<Plan> fetchplans =
+        await isar.plans.where().filter().isGoalEqualTo(true).findAll();
+    goalPlansList.clear();
+    // 清空資料、新增資料至列表
+    goalPlansList.addAll(fetchplans);
+    notifyListeners(); // 讀取資料後刷新螢幕
+  }
+
   // Update 改變計畫名稱
-  Future<void> updatePlan(int id, String newPlanName) async {
+  Future<void> updatePlanName(int id, String newPlanName) async {
     // 用id找到現有的Plan
     final existingPlan = await isar.plans.get(id);
     if (existingPlan != null) {
@@ -64,5 +78,26 @@ class PlanDataBase extends ChangeNotifier {
   Future<void> deletePlan(int id) async {
     await isar.writeTxn(() => isar.plans.delete(id));
     await fetchPlans();
+  }
+
+  // 用計畫名稱取得有目標時數的計畫物件
+  Plan? getPlanByName(String name) {
+    try {
+      return goalPlansList.firstWhere((plan) => plan.name == name);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // 更新goalPlansList中的計畫物件
+  Future<void> updatePlan(Plan updatedPlan) async {
+    final index = goalPlansList.indexWhere((plan) => plan.id == updatedPlan.id);
+    if (index != -1) {
+      // save to db 把newPlan寫進isar資料庫中的plans表
+      await isar.writeTxn(() => isar.plans.put(updatedPlan));
+      notifyListeners();
+      // 更新完確認一次資料
+      await fetchPlans();
+    }
   }
 }

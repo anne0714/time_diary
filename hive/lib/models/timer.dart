@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:Isar/models/note_database.dart';
 import 'package:provider/provider.dart';
 
+import 'plan_db.dart';
+
 class BuildTimer extends ChangeNotifier {
   late BuildContext context;
   BuildTimer(this.context); // 建構式，接收BuildContext
@@ -24,8 +26,36 @@ class BuildTimer extends ChangeNotifier {
       timer?.cancel();
     } else {
       duration = Duration(seconds: seconds);
+      // 更新目標剩餘時間
+      _updateGoalTime(addSeconds);
       notifyListeners(); // 吹號角 發出通知刷新畫面
-      print(duration);
+    }
+  }
+
+  // 更新目標剩餘時間
+  void _updateGoalTime(int addSeconds) {
+    final planName = context.read<PlanNotifier>().planName;
+    final planDataBase = context.read<PlanDataBase>();
+    final plan = planDataBase.getPlanByName(planName);
+
+    // 若計畫有設定目標，且未完成，減少剩餘時間
+    if (plan != null && !plan.isDone) {
+      plan.leftSecs -= addSeconds;
+      if (plan.leftSecs < 0) {
+        plan.leftSecs += 60;
+        plan.leftMins -= 1;
+      }
+      if (plan.leftMins < 0) {
+        plan.leftMins += 60;
+        plan.leftHours -= 1;
+      }
+      if (plan.leftHours < 0) {
+        plan.leftHours = 0;
+        plan.leftMins = 0;
+        plan.leftSecs = 0;
+        plan.isDone = true;
+      }
+      planDataBase.updatePlan(plan);
     }
   }
 

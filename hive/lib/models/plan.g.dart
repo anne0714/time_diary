@@ -27,20 +27,50 @@ const PlanSchema = CollectionSchema(
       name: r'hours',
       type: IsarType.long,
     ),
-    r'isGoal': PropertySchema(
+    r'isDone': PropertySchema(
       id: 2,
+      name: r'isDone',
+      type: IsarType.bool,
+    ),
+    r'isGoal': PropertySchema(
+      id: 3,
       name: r'isGoal',
       type: IsarType.bool,
     ),
+    r'leftHours': PropertySchema(
+      id: 4,
+      name: r'leftHours',
+      type: IsarType.long,
+    ),
+    r'leftMins': PropertySchema(
+      id: 5,
+      name: r'leftMins',
+      type: IsarType.long,
+    ),
+    r'leftSecs': PropertySchema(
+      id: 6,
+      name: r'leftSecs',
+      type: IsarType.long,
+    ),
     r'mins': PropertySchema(
-      id: 3,
+      id: 7,
       name: r'mins',
       type: IsarType.long,
     ),
     r'name': PropertySchema(
-      id: 4,
+      id: 8,
       name: r'name',
       type: IsarType.string,
+    ),
+    r'progress': PropertySchema(
+      id: 9,
+      name: r'progress',
+      type: IsarType.float,
+    ),
+    r'secs': PropertySchema(
+      id: 10,
+      name: r'secs',
+      type: IsarType.long,
     )
   },
   estimateSize: _planEstimateSize,
@@ -75,9 +105,15 @@ void _planSerialize(
 ) {
   writer.writeLong(offsets[0], object.color);
   writer.writeLong(offsets[1], object.hours);
-  writer.writeBool(offsets[2], object.isGoal);
-  writer.writeLong(offsets[3], object.mins);
-  writer.writeString(offsets[4], object.name);
+  writer.writeBool(offsets[2], object.isDone);
+  writer.writeBool(offsets[3], object.isGoal);
+  writer.writeLong(offsets[4], object.leftHours);
+  writer.writeLong(offsets[5], object.leftMins);
+  writer.writeLong(offsets[6], object.leftSecs);
+  writer.writeLong(offsets[7], object.mins);
+  writer.writeString(offsets[8], object.name);
+  writer.writeFloat(offsets[9], object.progress);
+  writer.writeLong(offsets[10], object.secs);
 }
 
 Plan _planDeserialize(
@@ -90,9 +126,15 @@ Plan _planDeserialize(
   object.color = reader.readLong(offsets[0]);
   object.hours = reader.readLong(offsets[1]);
   object.id = id;
-  object.isGoal = reader.readBool(offsets[2]);
-  object.mins = reader.readLong(offsets[3]);
-  object.name = reader.readString(offsets[4]);
+  object.isDone = reader.readBool(offsets[2]);
+  object.isGoal = reader.readBool(offsets[3]);
+  object.leftHours = reader.readLong(offsets[4]);
+  object.leftMins = reader.readLong(offsets[5]);
+  object.leftSecs = reader.readLong(offsets[6]);
+  object.mins = reader.readLong(offsets[7]);
+  object.name = reader.readString(offsets[8]);
+  object.progress = reader.readFloat(offsets[9]);
+  object.secs = reader.readLong(offsets[10]);
   return object;
 }
 
@@ -110,9 +152,21 @@ P _planDeserializeProp<P>(
     case 2:
       return (reader.readBool(offset)) as P;
     case 3:
-      return (reader.readLong(offset)) as P;
+      return (reader.readBool(offset)) as P;
     case 4:
+      return (reader.readLong(offset)) as P;
+    case 5:
+      return (reader.readLong(offset)) as P;
+    case 6:
+      return (reader.readLong(offset)) as P;
+    case 7:
+      return (reader.readLong(offset)) as P;
+    case 8:
       return (reader.readString(offset)) as P;
+    case 9:
+      return (reader.readFloat(offset)) as P;
+    case 10:
+      return (reader.readLong(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
   }
@@ -362,11 +416,176 @@ extension PlanQueryFilter on QueryBuilder<Plan, Plan, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> isDoneEqualTo(bool value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'isDone',
+        value: value,
+      ));
+    });
+  }
+
   QueryBuilder<Plan, Plan, QAfterFilterCondition> isGoalEqualTo(bool value) {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(FilterCondition.equalTo(
         property: r'isGoal',
         value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftHoursEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'leftHours',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftHoursGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'leftHours',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftHoursLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'leftHours',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftHoursBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'leftHours',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftMinsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'leftMins',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftMinsGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'leftMins',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftMinsLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'leftMins',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftMinsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'leftMins',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftSecsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'leftSecs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftSecsGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'leftSecs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftSecsLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'leftSecs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> leftSecsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'leftSecs',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
       ));
     });
   }
@@ -550,6 +769,120 @@ extension PlanQueryFilter on QueryBuilder<Plan, Plan, QFilterCondition> {
       ));
     });
   }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> progressEqualTo(
+    double value, {
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'progress',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> progressGreaterThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'progress',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> progressLessThan(
+    double value, {
+    bool include = false,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'progress',
+        value: value,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> progressBetween(
+    double lower,
+    double upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    double epsilon = Query.epsilon,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'progress',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        epsilon: epsilon,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> secsEqualTo(int value) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'secs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> secsGreaterThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'secs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> secsLessThan(
+    int value, {
+    bool include = false,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'secs',
+        value: value,
+      ));
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterFilterCondition> secsBetween(
+    int lower,
+    int upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'secs',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+      ));
+    });
+  }
 }
 
 extension PlanQueryObject on QueryBuilder<Plan, Plan, QFilterCondition> {}
@@ -581,6 +914,18 @@ extension PlanQuerySortBy on QueryBuilder<Plan, Plan, QSortBy> {
     });
   }
 
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByIsDone() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDone', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByIsDoneDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDone', Sort.desc);
+    });
+  }
+
   QueryBuilder<Plan, Plan, QAfterSortBy> sortByIsGoal() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isGoal', Sort.asc);
@@ -590,6 +935,42 @@ extension PlanQuerySortBy on QueryBuilder<Plan, Plan, QSortBy> {
   QueryBuilder<Plan, Plan, QAfterSortBy> sortByIsGoalDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isGoal', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByLeftHours() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftHours', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByLeftHoursDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftHours', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByLeftMins() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftMins', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByLeftMinsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftMins', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByLeftSecs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftSecs', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByLeftSecsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftSecs', Sort.desc);
     });
   }
 
@@ -614,6 +995,30 @@ extension PlanQuerySortBy on QueryBuilder<Plan, Plan, QSortBy> {
   QueryBuilder<Plan, Plan, QAfterSortBy> sortByNameDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'name', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByProgress() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'progress', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortByProgressDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'progress', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortBySecs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'secs', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> sortBySecsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'secs', Sort.desc);
     });
   }
 }
@@ -655,6 +1060,18 @@ extension PlanQuerySortThenBy on QueryBuilder<Plan, Plan, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByIsDone() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDone', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByIsDoneDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'isDone', Sort.desc);
+    });
+  }
+
   QueryBuilder<Plan, Plan, QAfterSortBy> thenByIsGoal() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isGoal', Sort.asc);
@@ -664,6 +1081,42 @@ extension PlanQuerySortThenBy on QueryBuilder<Plan, Plan, QSortThenBy> {
   QueryBuilder<Plan, Plan, QAfterSortBy> thenByIsGoalDesc() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'isGoal', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByLeftHours() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftHours', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByLeftHoursDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftHours', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByLeftMins() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftMins', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByLeftMinsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftMins', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByLeftSecs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftSecs', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByLeftSecsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'leftSecs', Sort.desc);
     });
   }
 
@@ -690,6 +1143,30 @@ extension PlanQuerySortThenBy on QueryBuilder<Plan, Plan, QSortThenBy> {
       return query.addSortBy(r'name', Sort.desc);
     });
   }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByProgress() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'progress', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenByProgressDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'progress', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenBySecs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'secs', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QAfterSortBy> thenBySecsDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'secs', Sort.desc);
+    });
+  }
 }
 
 extension PlanQueryWhereDistinct on QueryBuilder<Plan, Plan, QDistinct> {
@@ -705,9 +1182,33 @@ extension PlanQueryWhereDistinct on QueryBuilder<Plan, Plan, QDistinct> {
     });
   }
 
+  QueryBuilder<Plan, Plan, QDistinct> distinctByIsDone() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'isDone');
+    });
+  }
+
   QueryBuilder<Plan, Plan, QDistinct> distinctByIsGoal() {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'isGoal');
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QDistinct> distinctByLeftHours() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'leftHours');
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QDistinct> distinctByLeftMins() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'leftMins');
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QDistinct> distinctByLeftSecs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'leftSecs');
     });
   }
 
@@ -721,6 +1222,18 @@ extension PlanQueryWhereDistinct on QueryBuilder<Plan, Plan, QDistinct> {
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
       return query.addDistinctBy(r'name', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QDistinct> distinctByProgress() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'progress');
+    });
+  }
+
+  QueryBuilder<Plan, Plan, QDistinct> distinctBySecs() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'secs');
     });
   }
 }
@@ -744,9 +1257,33 @@ extension PlanQueryProperty on QueryBuilder<Plan, Plan, QQueryProperty> {
     });
   }
 
+  QueryBuilder<Plan, bool, QQueryOperations> isDoneProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'isDone');
+    });
+  }
+
   QueryBuilder<Plan, bool, QQueryOperations> isGoalProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'isGoal');
+    });
+  }
+
+  QueryBuilder<Plan, int, QQueryOperations> leftHoursProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'leftHours');
+    });
+  }
+
+  QueryBuilder<Plan, int, QQueryOperations> leftMinsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'leftMins');
+    });
+  }
+
+  QueryBuilder<Plan, int, QQueryOperations> leftSecsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'leftSecs');
     });
   }
 
@@ -759,6 +1296,18 @@ extension PlanQueryProperty on QueryBuilder<Plan, Plan, QQueryProperty> {
   QueryBuilder<Plan, String, QQueryOperations> nameProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'name');
+    });
+  }
+
+  QueryBuilder<Plan, double, QQueryOperations> progressProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'progress');
+    });
+  }
+
+  QueryBuilder<Plan, int, QQueryOperations> secsProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'secs');
     });
   }
 }
